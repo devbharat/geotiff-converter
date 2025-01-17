@@ -2,8 +2,7 @@ import React from 'react';
 
 const OutputPath = ({ onSelect, outputPath }) => {
   const handleClick = async () => {
-    const { ipcRenderer } = window.require('electron');
-    const filePath = await ipcRenderer.invoke('pick-save-location');
+    const filePath = await window.electron.pickSaveLocation(); // Use contextBridge API
     if (filePath) onSelect(filePath);
   };
 
@@ -18,4 +17,3 @@ const OutputPath = ({ onSelect, outputPath }) => {
 };
 
 export default OutputPath;
-

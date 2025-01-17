@@ -8,8 +8,7 @@ const ConvertButton = ({ inputPath, outputPath, setStatus }) => {
     }
 
     setStatus('Converting...');
-    const { ipcRenderer } = window.require('electron');
-    const result = await ipcRenderer.invoke('convert-file', inputPath, outputPath);
+    const result = await window.electron.convertFile(inputPath, outputPath);
     if (result.success) {
       setStatus(`Conversion successful! File saved at ${outputPath}`);
     } else {

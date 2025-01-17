@@ -5,14 +5,26 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build:css": "npx tailwindcss -i ./src/index.css -o ./public/style.css",
+    "build:react": "vite build",
+    "build": "npm run build:css && npm run build:react"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
     "electron": "^34.0.0",
-    "sharp": "^0.33.5"
+    "electron-reload": "^2.0.0-alpha.1",
+    "jiti": "^2.4.2",
+    "postcss": "^8.5.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.7"
   },
   "devDependencies": {
     "electron-packager": "^17.1.2"

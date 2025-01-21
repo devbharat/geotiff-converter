@@ -1,3 +1,4 @@
+// main.js
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 require('electron-reload')(path.join(__dirname, 'public'), {
@@ -8,49 +9,38 @@ const sharp = require('sharp');
 
 let mainWindow;
 
-// Function to create the main window
-const createMainWindow = () => {
+function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Secure bridge between Electron and React
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       enableRemoteModule: false,
       nodeIntegration: false,
     },
   });
 
-  // Load React's index.html
   mainWindow.loadFile(path.join(__dirname, 'public/index.html'));
 
-  // Open developer tools during development
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
 
-  // Handle window close
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-};
+}
 
-// Electron app lifecycle hooks
 app.on('ready', createMainWindow);
-
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
-
 app.on('activate', () => {
-  if (mainWindow === null) {
-    createMainWindow();
-  }
+  if (mainWindow === null) createMainWindow();
 });
 
-// IPC Handlers
+// IPC handlers
 ipcMain.handle('pick-file', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
@@ -66,15 +56,36 @@ ipcMain.handle('pick-save-location', async () => {
   return result.filePath;
 });
 
-ipcMain.handle('convert-file', async (_, inputPath, outputPath) => {
+ipcMain.handle('convert-file', async (event, inputPath, outputPath) => {
   try {
-    await sharp(inputPath, { limitInputPixels: false })
+    const initialProcessed = sharp.counters().process;
+    // Start processing the file
+    const sharpTask = sharp(inputPath, { limitInputPixels: false })
       .tiff({ tile: true, pyramid: true, compression: 'webp' })
       .toFile(outputPath);
+    // Poll for progress
+    const pollInterval = 100; // milliseconds
+    const pollProgress = setInterval(() => {
+      const currentProcessed = sharp.counters().process;
+      const queueSize = sharp.counters().queue;
+
+      // Estimate progress (queue size decreases, process count increases)
+      const progress = queueSize === 0
+        ? 100
+        : ((currentProcessed - initialProcessed) / (currentProcessed - initialProcessed + queueSize)) * 100;
+
+      event.sender.send('conversion-progress', progress.toFixed(2));
+
+      // Stop polling if the task is complete
+      if (queueSize === 0) {
+        clearInterval(pollProgress);
+      }
+    }, pollInterval);
+
+    await sharpTask;
     return { success: true };
   } catch (err) {
     console.error('Conversion error:', err);
     return { success: false, error: err.message };
   }
 });
-

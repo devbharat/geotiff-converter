@@ -1,23 +1,33 @@
 import React from 'react';
+import { Save } from 'lucide-react';
 
 const OutputPath = ({ onSelect, outputPath }) => {
   const handleClick = async () => {
     const filePath = await window.electron.pickSaveLocation();
-    if (filePath) onSelect(filePath);
+    if (filePath) {
+      onSelect(filePath);
+    }
   };
 
-  // Extract just the filename
-  const fileName = outputPath ? outputPath.split(/[/\\]/).pop() : '';
+  // Only display the file name, not the full path
+  const fileName = outputPath ? outputPath.split(/[\\/]/).pop() : '';
 
   return (
-    <button
-      onClick={handleClick}
-      className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200 w-full"
-      style={{ maxWidth: '100%' }}
-      title={fileName}
-    >
-      {fileName ? `Output: ${fileName}` : 'Choose save location'}
-    </button>
+    <div className="relative">
+      <button
+        onClick={handleClick}
+        className="w-full flex items-center justify-between p-3 border border-dashed 
+                   border-blue-300 rounded-lg hover:border-blue-500 transition-colors group"
+      >
+        <div className="flex items-center space-x-3 overflow-hidden text-ellipsis whitespace-nowrap">
+          <Save className="text-blue-500" size={20} />
+          <span className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+            {fileName || 'Choose save location'}
+          </span>
+        </div>
+        <span className="text-blue-500 text-sm">Browse</span>
+      </button>
+    </div>
   );
 };
 

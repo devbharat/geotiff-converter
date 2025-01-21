@@ -69,7 +69,7 @@ ipcMain.handle('pick-save-location', async () => {
 ipcMain.handle('convert-file', async (_, inputPath, outputPath) => {
   try {
     await sharp(inputPath, { limitInputPixels: false })
-      .tiff({ tile: true, pyramid: true, compression: 'lzw' })
+      .tiff({ tile: true, pyramid: true, compression: 'webp' })
       .toFile(outputPath);
     return { success: true };
   } catch (err) {

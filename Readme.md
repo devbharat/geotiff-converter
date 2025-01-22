@@ -9,7 +9,7 @@ A desktop application (built with [Electron](https://www.electronjs.org/), [Reac
 ## Features
 
 - **User-friendly interface** for selecting an input GeoTIFF and specifying an output file path.
-- **Progress updates** during conversion, based on a rough heuristic (18 seconds per GB).
+- **Progress updates** during conversion, based on a rough heuristic.
 - **Tile and pyramid creation** for large GeoTIFFs.
 - **WebP compression** to reduce file size.
 

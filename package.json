@@ -8,7 +8,7 @@
     "start": "electron .",
     "build:css": "npx tailwindcss -i ./src/index.css -o ./public/style.css",
     "build:react": "vite build",
-    "build": "npm run build:css && npm run build:react"
+    "build": "npm run build:css && cp public/style.css src/style.css && npm run build:react"
   },
   "keywords": [],
   "author": "",

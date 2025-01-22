@@ -1,46 +1,82 @@
-import React, { useState } from 'react';
-import { FileOutput, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 const ConvertButton = ({ inputPath, outputPath, setStatus }) => {
-  const [isConverting, setIsConverting] = useState(false);
+  const [progress, setProgress] = useState(0); // Progress state (0 to 100)
+  const [isConverting, setIsConverting] = useState(false); // Conversion state
 
-  const handleClick = async () => {
+  useEffect(() => {
+    const ipcRenderer = window.electron.ipcRenderer;
+
+    // Listen for progress updates
+    ipcRenderer.on('conversion-progress', (event, progressValue) => {
+      setProgress(Number(progressValue)); // Update progress state
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners('conversion-progress');
+    };
+  }, []);
+
+  const handleConversion = async () => {
     if (!inputPath || !outputPath) {
       setStatus({ type: 'error', message: 'Please select input and output paths.' });
       return;
     }
 
-    setIsConverting(true);
-    setStatus({ type: 'progress', message: 'Converting...' });
+    const electron = window.electron;
+
+    setProgress(0); // Reset progress
+    setIsConverting(true); // Indicate conversion is in progress
+    setStatus({ type: 'progress', message: 'Starting conversion...' });
 
     try {
-      const result = await window.electron.convertFile(inputPath, outputPath);
+      const result = await electron.convertFile(inputPath, outputPath);
+
       if (result.success) {
-        setStatus({ type: 'success', message: 'Conversion successful!' });
+        setStatus({ type: 'success', message: 'Conversion completed successfully!' });
       } else {
-        setStatus({ type: 'error', message: result.error || 'Conversion failed.' });
+        setStatus({ type: 'error', message: `Conversion failed: ${result.error}` });
       }
     } catch (error) {
-      setStatus({ type: 'error', message: error.message });
+      setStatus({ type: 'error', message: `An error occurred: ${error.message}` });
     } finally {
-      setIsConverting(false);
+      setIsConverting(false); // Reset conversion state
     }
   };
 
   return (
     <button
-      onClick={handleClick}
-      disabled={isConverting || !inputPath || !outputPath}
-      className="w-full py-3 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
-                 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors
-                 flex items-center justify-center space-x-2"
+      className="relative w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none flex items-center justify-center"
+      onClick={handleConversion}
+      disabled={isConverting} // Disable button during conversion
     >
       {isConverting ? (
-        <Loader2 className="animate-spin" size={20} />
+        <div className="relative w-6 h-6">
+          {/* Circular progress indicator */}
+          <svg className="absolute inset-0 w-full h-full transform rotate-[-90deg]" viewBox="0 0 36 36">
+            <circle
+              cx="18"
+              cy="18"
+              r="16"
+              fill="none"
+              stroke="#e5e7eb" // Background circle color (gray)
+              strokeWidth="4"
+            />
+            <circle
+              cx="18"
+              cy="18"
+              r="16"
+              fill="none"
+              stroke="#4ade80" // Progress circle color (green)
+              strokeWidth="4"
+              strokeDasharray="100"
+              strokeDashoffset={100 - progress} // Adjust offset based on progress
+            />
+          </svg>
+        </div>
       ) : (
-        <FileOutput size={20} />
+        'Convert'
       )}
-      <span>{isConverting ? 'Converting...' : 'Convert'}</span>
     </button>
   );
 };

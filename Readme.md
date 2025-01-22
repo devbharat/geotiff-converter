@@ -6,6 +6,9 @@
 
 A desktop application (built with [Electron](https://www.electronjs.org/), [React](https://react.dev/), and [Tailwind CSS](https://tailwindcss.com/)) that allows you to convert standard GeoTIFF files into pyramidal tiled GeoTIFFs (with WebP compression) using [Sharp](https://github.com/lovell/sharp).
 
+![Screenshot of the app](./image/app-screenshot.png)
+
+
 ## Features
 
 - **User-friendly interface** for selecting an input GeoTIFF and specifying an output file path.

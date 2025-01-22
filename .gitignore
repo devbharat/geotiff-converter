@@ -1,2 +1,24 @@
-node_modules/*
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Build artifacts
+/public/assets/
+public/style.css
+dist/
+release-build/
+
+# Logs
+*.log
+
+# macOS files
 .DS_Store
+
+# Visual Studio Code settings
+.vscode/
+
+# Optional: If you use .env files, ignore them
+.env
+

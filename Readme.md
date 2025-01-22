@@ -29,7 +29,7 @@ A desktop application (built with [Electron](https://www.electronjs.org/), [Reac
 1. **Clone** this repository or [download the zip](https://github.com/devbharat/geotiff-converter/archive/refs/heads/main.zip).
 2. Navigate into the project directory:
    ```bash
-   cd geotiff-converter-gui
+   cd geotiff-converter
    ```
 3. Install dependencies:
    ```bash
